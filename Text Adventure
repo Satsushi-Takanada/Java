@@ -7,9 +7,13 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -34,7 +38,8 @@ public class Game {
 	StoryScreen StoryShow = new StoryScreen(); //Story Class for all story method
 	Location Enter = new Location(); //Location class for all 4 location method
 	
-	String filePath = "C:/Programming/Java Codes/RPG_Game/Intro_Story.txt"; //File for story
+	String music = "C:/Programming/Java Codes/RPG_Game/Game Music/dungeon music.wav";
+	String filePath = "C:/Programming/Java Codes/RPG_Game/Text Files/Intro_Story.txt"; //File for story
 	String[] sentences = File_String_Array(filePath); //Array that holds the story per sentence
 	
 	public String[] File_String_Array(String filePath) { 
@@ -53,6 +58,22 @@ public class Game {
 	        return fileContent.toString().split("(?<=[.!?])\\s+");
 	} /*This method will get all the text in the file and put them in the array sentence by
 	  sentence using string builder for single thread and the split method*/
+	
+	public void Background_Music() {
+		File soundFile = new File(music);
+		
+		try {
+			 AudioInputStream audioStream = AudioSystem.getAudioInputStream(soundFile);
+
+		        Clip clip = AudioSystem.getClip();
+		        clip.open(audioStream);
+		        clip.loop(Clip.LOOP_CONTINUOUSLY);
+		        
+		        clip.start();
+		} catch (Exception e) {
+			System.out.println("ERROR");
+		}
+	} //Plays background music
 	
 	public void Reset() {
 		
@@ -133,7 +154,7 @@ public class Game {
 	public void GameScreen() {	
 		game_container.remove(title_panel);
 		game_container.remove(start_button_panel);
-        
+		
 		main_panel = new JPanel();
 		main_panel.setBounds(20, 100, 750, 220);
 		main_panel.setBackground(Color.black);
@@ -182,6 +203,7 @@ public class Game {
 		game_container.add(main_panel);
 		game_container.add(choices_panel);
 		
+		Background_Music();
 		StoryShow.Story();
 	} //Creates the gamescreen for all of the text and edits of text
 	
@@ -307,7 +329,7 @@ public class Game {
 			main_text_area.setText("Welcome to Herald’s Hammer.\n\n"
 					+ "Buy something or get the fuck out.");
 			
-			choice1_button.setText("");
+			choice1_button.setText("Shop");
 			choice1_button.setActionCommand("");
 			
 			choice2_button.setText("Leave");
@@ -317,8 +339,7 @@ public class Game {
 	            }
 	        });
 			
-			choice3_button.setText("");
-			choice3_button.setActionCommand("");
+			choice3_button.setVisible(false);
 		} // Shop Method
 		
 		public void Dungeon() {
