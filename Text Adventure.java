@@ -38,9 +38,16 @@ public class Game {
 	StoryScreen StoryShow = new StoryScreen(); //Story Class for all story method
 	Location Enter = new Location(); //Location class for all 4 location method
 	
-	String music = "C:/Programming/Java Codes/RPG_Game/Game Music/dungeon music.wav";
+	String Story_Music = "C:/Programming/Java Codes/RPG_Game/Game Music/Story Music.wav";
+	String Town_Music = "C:/Programming/Java Codes/RPG_Game/Game Music/Town Music.wav";
+	String Tavern_Music = "C:/Programming/Java Codes/RPG_Game/Game Music/Tavern Music.wav";
+	String Shop_Music = "C:/Programming/Java Codes/RPG_Game/Game Music/Shop Music.wav";
+	
 	String filePath = "C:/Programming/Java Codes/RPG_Game/Text Files/Intro_Story.txt"; //File for story
 	String[] sentences = File_String_Array(filePath); //Array that holds the story per sentence
+	
+	int count = 0;
+	Clip currentClip;
 	
 	public String[] File_String_Array(String filePath) { 
 		 StringBuilder fileContent = new StringBuilder();
@@ -59,24 +66,27 @@ public class Game {
 	} /*This method will get all the text in the file and put them in the array sentence by
 	  sentence using string builder for single thread and the split method*/
 	
-	public void Background_Music() {
-		File soundFile = new File(music);
+	public void Background_Music(String current_music) {
+		File soundFile = new File(current_music);
 		
-		try {
-			 AudioInputStream audioStream = AudioSystem.getAudioInputStream(soundFile);
+		try {   
+			if (currentClip != null && currentClip.isRunning()) {
+                currentClip.stop();
+                currentClip.close();
+            }
+			
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(soundFile);
 
-		        Clip clip = AudioSystem.getClip();
-		        clip.open(audioStream);
-		        clip.loop(Clip.LOOP_CONTINUOUSLY);
-		        
-		        clip.start();
-		} catch (Exception e) {
-			System.out.println("ERROR");
-		}
+            currentClip = AudioSystem.getClip();
+            currentClip.open(audioStream);
+            currentClip.loop(Clip.LOOP_CONTINUOUSLY);  
+            currentClip.start();  
+        } catch (Exception e) {
+            System.out.println("ERROR");
+        }
 	} //Plays background music
 	
 	public void Reset() {
-		
 		game_container.remove(main_panel);
         game_container.remove(choices_panel);
         
@@ -159,7 +169,7 @@ public class Game {
 		main_panel.setBounds(20, 100, 750, 220);
 		main_panel.setBackground(Color.black);
 		
-		main_text_area = new JTextArea();
+		main_text_area = new JTextArea(sentences[count]);
 		main_text_area.setBounds(100, 100, 750, 250);
 		main_text_area.setBackground(Color.black);
 		main_text_area.setForeground(Color.white);
@@ -203,7 +213,6 @@ public class Game {
 		game_container.add(main_panel);
 		game_container.add(choices_panel);
 		
-		Background_Music();
 		StoryShow.Story();
 	} //Creates the gamescreen for all of the text and edits of text
 	
@@ -222,8 +231,6 @@ public class Game {
 	}
 	
 	public class StoryScreen {
-		int count = 0; //Count the next of the user
-		
 		public void Update_Story(String user_choice) {
 			try {
 		        if (user_choice.equals("next")) {
@@ -235,49 +242,46 @@ public class Game {
 		                count--;
 		            }
 		        }
-		    } 
+		    } catch(Exception e) {
+		    	System.out.println("ERROR");
+		    }
 			finally {
 		        main_text_area.setText(sentences[count]);
 		    }
-			
-			if (count == sentences.length - 1) {
-				choice3_button.setVisible(true);
-			}
+			choice3_button.setVisible(count == sentences.length - 1);
 		} //This will next and back the story depending on the button that is pressed and displays it
 		
 		public void Story() {
-			try {
-				choice1_button.setText("NEXT");
-				choice1_button.addActionListener(new ActionListener() {
-		            public void actionPerformed(ActionEvent event) {
-			            Update_Story("next");
-		            }
-		        });
-				
-				choice2_button.setText("BACK");
-				choice2_button.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent event) {
-			            Update_Story("back");
-		            }
-		        });
-				
-				choice3_button.setText("FINISH");
-				choice3_button.setVisible(false);
-				choice3_button.addActionListener(new ActionListener() {
-		            public void actionPerformed(ActionEvent e) {
-		            	Enter.Town();
-		            }
-		        });
-			} 
-			finally {
-				main_text_area.setText(sentences[count]);
-			}
+			Background_Music(Story_Music);
+			
+			choice1_button.setText("NEXT");
+			choice1_button.addActionListener(new ActionListener() {
+	            public void actionPerformed(ActionEvent event) {
+		            Update_Story("next");
+	            }
+	        });
+			
+			choice2_button.setText("BACK");
+			choice2_button.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent event) {
+		            Update_Story("back");
+	            }
+	        });
+			
+			choice3_button.setText("FINISH");
+			choice3_button.setVisible(false);
+			choice3_button.addActionListener(new ActionListener() {
+	            public void actionPerformed(ActionEvent e) {
+	            	Enter.Town();
+	            }
+	        });
 		} //Button for next and back and finish
 	} //Class that holds all the story for the game
 	
 	public class Location {
 		
 		public void Town() {
+			Background_Music(Town_Music);
 			Reset();
 			
 			main_text_area.setText("Welcome to Town!");
@@ -305,6 +309,7 @@ public class Game {
 		} //Button for all of the plaves that can be visited
 		
 		public void Tavern() {
+			Background_Music(Tavern_Music);
 			Reset();
 			
 			main_text_area.setText("Welcome to the The Iron Chalice!\n\n"
@@ -324,10 +329,11 @@ public class Game {
 		} //Tavern method
 		
 		public void Shop() {
+			Background_Music(Shop_Music);
 			Reset();
 			
 			main_text_area.setText("Welcome to Herald’s Hammer.\n\n"
-					+ "Buy something or get the fuck out.");
+					+ "What could i get ya?");
 			
 			choice1_button.setText("Shop");
 			choice1_button.setActionCommand("");
