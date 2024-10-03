@@ -51,18 +51,18 @@ public class Game {
 	
 	public String[] File_String_Array(String filePath) { 
 		 StringBuilder fileContent = new StringBuilder();
-	        
-	        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-	            String line;
-	            while ((line = reader.readLine()) != null) {
-	                fileContent.append(line).append(" ");
-	            }
-	        } catch (IOException e) {
-	            System.err.println("Error reading file: " + e.getMessage());
-	            return null;
-	        }
-
-	        return fileContent.toString().split("(?<=[.!?])\\s+");
+		 
+		 try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+			 String line;
+			 while ((line = reader.readLine()) != null) {
+				 fileContent.append(line).append(" ");
+	         }
+		 } catch (IOException e) {
+			 System.err.println("Error reading file: " + e.getMessage());
+	         return null; 
+		 }
+		 
+		 return fileContent.toString().split("(?<=[.!?])\\s+");
 	} /*This method will get all the text in the file and put them in the array sentence by
 	  sentence using string builder for single thread and the split method*/
 	
@@ -364,3 +364,4 @@ public class Game {
 		} // Dungeon Method
 	} //Class that holds all the location
 }
+
